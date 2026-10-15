@@ -1,4 +1,4 @@
-package br.com.uedercardoso.gestaodecontatos.api;
+package br.com.uedercardoso.gestaodecontatos.controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,41 +14,39 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.uedercardoso.gestaodecontatos.models.Contato;
-import br.com.uedercardoso.gestaodecontatos.repositories.RepositorioContato;
+import br.com.uedercardoso.gestaodecontatos.enums.contact.OrderType;
+import br.com.uedercardoso.gestaodecontatos.models.Contact;
+import br.com.uedercardoso.gestaodecontatos.repositories.ContactRepository;
 
 @RestController
-public class Contatos {
+public class ContactController {
 
 	private static String HOST = "C:/Users/User/Desktop";
 	
 	@Autowired
-	private RepositorioContato repositorioContato;
+	private ContactRepository contactRepository;
 	
-	////https://spring.io/guides/gs/rest-service-cors/
 	//@CrossOrigin(origins = "http://localhost:4200")
-	@PostMapping("/adicionar/contato")
-	public Map<String,String> adicionarContato(@Valid @RequestParam String nome, @Valid @RequestParam String sobrenome,
-			@Valid @RequestParam long telefone, @Valid @RequestParam MultipartFile foto, @Valid @RequestParam String email,
-			@Valid @RequestParam String linkTwitter, @Valid @RequestParam String contatoSkype) {
+	@PostMapping("/save")
+	public ResponseEntity<Contact> save(@Valid @RequestBody Contact contact) {
 	
-		Map<String,String> map =  new HashMap<String,String>(); 
-		
 		try {
 			String path = HOST+"/fotos/";
 			this.criarPasta(path); //Criar pasta "fotos"
 				        
-			Contato contato = this.criarContato(nome, sobrenome, telefone, null, email, linkTwitter, contatoSkype);
-			contato = repositorioContato.save(contato);
+			Contact contato = this.criarContato(nome, sobrenome, telefone, null, email, linkTwitter, contatoSkype);
+			contato = contactRepository.save(contato);
 			
 			path += "contato_"+contato.getCodigo()+"/";
 			this.criarPasta(path);
@@ -57,34 +55,32 @@ public class Contatos {
 			
 	        this.download(foto, pathFile); //Faz download da foto
 	        
-	        repositorioContato.save(contato); 
+	        contactRepository.save(contato); 
 	        
-	        map.put("result", "ok");
 			
 		} catch(Exception e) {
-			//e.printStackTrace();
-			map.put("result", "failed");
-			map.put("message", e.getMessage());
-			
+			e.printStackTrace();
 		}
 		
-		return map;
+		return ResponseEntity.ok(contact);
+	}
+
+	@PostMapping("/save")
+	public ResponseEntity<Void> savePhoto(@Valid @RequestParam MultipartFile foto) {
+		return ResponseEntity.ok().build();
 	}
 		
-	@PutMapping("/atualizar/contato/{codContato}")
-	public Map<String,String> atualizarContato(@PathVariable("codContato") int codContato, @Valid @RequestParam String nome, 
-			@Valid @RequestParam String sobrenome,@Valid @RequestParam long telefone, 
-			@Valid @RequestParam MultipartFile foto, @Valid @RequestParam String email,
-			@Valid @RequestParam String linkTwitter, @Valid @RequestParam String contatoSkype) {
+	@PutMapping("/{id}/update")
+	public Map<String,String> update(@PathVariable("id") Integer id, @RequestBody @Valid Contact contact) {
 		
 		Map<String,String> map =  new HashMap<String,String>(); 
 		
-		if(repositorioContato.existsById(codContato)) {
+		if(contactRepository.existsById(codContato)) {
 			
 			String path = HOST+"/fotos/contato_"+codContato+"/";
 			String pathFile = null;
 			
-			Optional<Contato> op = repositorioContato.findById(codContato);
+			Optional<Contato> op = contactRepository.findById(codContato);
 			Contato contato = op.get();
 			
 			try {
@@ -107,7 +103,7 @@ public class Contatos {
 				contato = this.criarContato(nome, sobrenome, telefone, pathFile, email, linkTwitter, contatoSkype);
 				contato.setCodigo(codContato);
 				
-				repositorioContato.save(contato);
+				contactRepository.save(contato);
 				
 				map.put("result", "ok"); 
 				
@@ -123,14 +119,14 @@ public class Contatos {
 		
 	}
 	
-	@DeleteMapping("/excluir/contato/{codContato}")
-	public Map<String, String> excluirContato(@PathVariable("codContato") int codContato) {
+	@DeleteMapping("/delete/{id}")
+	public Map<String, String> delete(@PathVariable("id") Integer id) {
 		
 		Map<String, String> map = new HashMap<String,String>(); 
 		
-		if(repositorioContato.existsById(codContato)) {
+		if(contactRepository.existsById(codContato)) {
 			
-			Optional<Contato> op = repositorioContato.findById(codContato); 
+			Optional<Contato> op = contactRepository.findById(codContato); 
 			Contato contato = op.get(); 
 			
 			try {
@@ -147,7 +143,7 @@ public class Contatos {
 					}
 				}
 				
-				repositorioContato.deleteById(codContato);	
+				contactRepository.deleteById(codContato);	
 				
 				map.put("result", "deleted");
 				
@@ -165,33 +161,33 @@ public class Contatos {
 		
 	}
 	
-	@GetMapping("/contatos/ordenar/{ordenacao}")
-	public Map<String,Object> listarContatoOrdenadoPeloValor(@PathVariable("ordenacao") String ordenacao) {
+	@GetMapping("/list/{order_type}")
+	public Map<String,Object> getContacts(@PathVariable("order_type") String orderType) {
 		
 		Map<String,Object> map = new HashMap<String,Object>();
-		List<Contato> listaContato = new LinkedList<Contato>();
+		List<Contact> listaContato = new LinkedList<Contact>();
 		
 		try {
 			
-			switch(ordenacao) {
-				case "codigo":{
-					listaContato = repositorioContato.findContactsOrderById();
+			switch(orderType) {
+				case "ID":{
+					listaContato = contactRepository.findContactsOrderById();
 					break;
 				}
-				case "nome":{
-					listaContato = repositorioContato.findContactsOrderByName();
+				case "NAME":{
+					listaContato = contactRepository.findContactsOrderByName();
 					break; 
 				} 
-				case "sobrenome":{
-					listaContato = repositorioContato.findContactsOrderBySobrenome();
+				case "SURNAME":{
+					listaContato = contactRepository.findContactsOrderBySobrenome();
 					break;
 				}
-				case "telefone":{
-					listaContato = repositorioContato.findContactsOrderByTelephone();
+				case "PHONE":{
+					listaContato = contactRepository.findContactsOrderByTelephone();
 					break;
 				}
 				default:{
-					listaContato = repositorioContato.findAll();
+					listaContato = contactRepository.findAll();
 					break;
 				}
 			}
@@ -199,7 +195,6 @@ public class Contatos {
 			map = this.criarMap(listaContato);
 					
 		} catch(Exception e) {
-			//e.printStackTrace();
 			map = this.criarMap(null);
 		}
 		
@@ -209,14 +204,14 @@ public class Contatos {
 	
 	
 	@GetMapping("/buscar/contato/{codContato}")
-	public Map<String,Object> buscarContato(@PathVariable("codContato") int codContato) {
+	public Map<String,Object> getContact(@PathVariable("codContato") int codContato) {
 		
 		Map<String, Object> map = new HashMap<String,Object>();
 		
-		if(repositorioContato.existsById(codContato)) {
+		if(contactRepository.existsById(codContato)) {
 			
 			try {
-				Optional<Contato> op = repositorioContato.findById(codContato); 
+				Optional<Contato> op = contactRepository.findById(codContato); 
 				Contato contato = op.get();
 				
 				List<Contato> listaContato = new LinkedList<Contato>();
@@ -242,7 +237,7 @@ public class Contatos {
 		 
 		try {
 			
-			List<Contato> listaContato = repositorioContato.findAll();
+			List<Contato> listaContato = contactRepository.findAll();
 			
 			map = this.criarMap(listaContato);
 			
@@ -265,15 +260,15 @@ public class Contatos {
 		try {
 			switch(atributo) {
 				case "nome":{
-					listaContato = repositorioContato.findContactByName(valor);
+					listaContato = contactRepository.findContactByName(valor);
 					break;
 				}
 				case "sobrenome":{
-					listaContato = repositorioContato.findContactBySobrenome(valor);
+					listaContato = contactRepository.findContactBySobrenome(valor);
 					break;
 				}
 				case "telefone":{
-					listaContato = repositorioContato.findContactByTelephone(Long.parseLong(valor));
+					listaContato = contactRepository.findContactByTelephone(Long.parseLong(valor));
 					break;
 				}
 				default:{
