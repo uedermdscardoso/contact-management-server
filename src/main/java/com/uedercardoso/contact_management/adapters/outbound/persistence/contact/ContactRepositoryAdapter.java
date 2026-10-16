@@ -45,37 +45,63 @@ public class ContactRepositoryAdapter implements ContactRepositoryPort {
 
 	@Override
 	public List<Contact> findByName(String name) {
-		return this.repository.findByName(name);
+		List<ContactEntity> contactEntities = this.repository.findByName(name);
+		
+		return contactEntities.stream().map(mapper::toDomain).toList();
 	}
 
 	@Override
 	public List<Contact> findBySurname(String surname) {
-		return this.repository.findBySurname(surname);
+		List<ContactEntity> contactEntities = this.repository.findBySurname(surname);
+		
+		return contactEntities.stream()
+			.map(mapper::toDomain)
+			.toList();
 	}
 
 	@Override
 	public List<Contact> findByPhone(String phone) {
-		return this.repository.findByPhone(phone);
+		List<ContactEntity> contactEntities = this.repository.findByPhone(phone);
+		
+		return contactEntities.stream()
+			.map(mapper::toDomain)
+			.toList();
 	}
 
 	@Override
 	public List<Contact> findContactById() {
-		return this.repository.findContactById();
+		List<ContactEntity> contactEntities = this.repository.findContactById();
+		
+		return contactEntities.stream()
+			.map(mapper::toDomain)
+			.toList();
 	}
 
 	@Override
 	public List<Contact> findContactByName() {
-		return this.repository.findContactByName();
+		List<ContactEntity> contactEntities = this.repository.findContactByName();
+		
+		return contactEntities.stream()
+			.map(mapper::toDomain)
+			.toList();
 	}
 
 	@Override
 	public List<Contact> findContactBySurname() {
-		return this.repository.findContactBySurname();
+		List<ContactEntity> contactEntities = this.repository.findContactBySurname();
+		
+		return contactEntities.stream()
+			.map(mapper::toDomain)
+			.toList();
 	}
 
 	@Override
 	public List<Contact> findContactByPhone() {
-		return this.repository.findContactByPhone();
+		List<ContactEntity> contactEntities = this.repository.findContactByPhone();
+		
+		return contactEntities.stream()
+			.map(mapper::toDomain)
+			.toList();
 	}
 
     @Override
