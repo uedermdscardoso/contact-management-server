@@ -30,6 +30,6 @@ public class UpdateContactUserCase {
         
 		Contact contact = new Contact(name, surname, phone, photoPath, email, twitterLink, skypeContact);
 		
-		return contactRepositoryPort.update(id, contact);
+		return this.contactRepositoryPort.update(id, contact);
     }
 }

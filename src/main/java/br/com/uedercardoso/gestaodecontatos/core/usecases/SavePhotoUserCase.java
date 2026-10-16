@@ -1,7 +1,6 @@
 package br.com.uedercardoso.gestaodecontatos.core.usecases;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +17,7 @@ public class SavePhotoUserCase {
 		this.photoServicePort = photoServicePort;
 	}
 
-	public Optional<String> execute(MultipartFile file, String contentType, String fileName) {
+	public String execute(MultipartFile file, String contentType, String fileName) {
 		try {
 			byte[] data = file.getBytes();
 			
@@ -26,10 +25,9 @@ public class SavePhotoUserCase {
 				throw new IllegalArgumentException("Photo data is invalid.");
 			}
 		
-			return photoServicePort.save(file, contentType, fileName);
+			return this.photoServicePort.save(file, contentType, fileName);
 	 	} catch (IOException e) {
-			log.error("File is invalid", e);
-			return Optional.empty();
+			throw new RuntimeException("File is invalid: " + e.getMessage(), e);
         }
 	}
 }
