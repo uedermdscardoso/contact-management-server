@@ -1,16 +1,27 @@
 package com.uedercardoso.contact_management.adapters.outbound.persistence.contact;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
-import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
 import com.uedercardoso.contact_management.core.domain.Contact;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public interface ContactEntityMapper {
-   
-	@NonNull Contact toDomain(ContactEntity entity);
+@Component
+public class ContactEntityMapper {
 
-    @NonNull ContactEntity toEntity(Contact domainContact);
+    public Contact toDomain(ContactEntity entity) {
+        if(entity == null) {
+            return null;
+        }
 
+        return new Contact(entity);
+    }
+
+    public ContactEntity toEntity(Contact domain) {
+        if(domain == null) {
+            return null;
+        }
+
+        final ContactEntity entity = new ContactEntity(domain);
+        
+        return entity;
+    }
 }

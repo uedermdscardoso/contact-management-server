@@ -3,6 +3,7 @@ package com.uedercardoso.contact_management.infraestructure.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.uedercardoso.contact_management.adapters.outbound.persistence.contact.ContactEntityMapper;
 import com.uedercardoso.contact_management.core.ports.ContactRepositoryPort;
 import com.uedercardoso.contact_management.core.ports.PhotoServicePort;
 import com.uedercardoso.contact_management.core.usecases.CheckPhotoUserCase;
@@ -18,9 +19,9 @@ import com.uedercardoso.contact_management.core.usecases.UpdateContactUserCase;
 
 @Configuration
 public class BeanConfig {
-
+	
 	@Bean
-    public CheckPhotoUserCase createContactUseCase(PhotoServicePort photoServicePort) {
+    public CheckPhotoUserCase checkPhotoUseCase(PhotoServicePort photoServicePort) {
         return new CheckPhotoUserCase(photoServicePort);
     }
 

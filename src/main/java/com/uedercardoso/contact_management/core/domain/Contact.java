@@ -1,5 +1,7 @@
 package com.uedercardoso.contact_management.core.domain;
 
+import com.uedercardoso.contact_management.adapters.outbound.persistence.contact.ContactEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,4 +40,15 @@ public class Contact {
         this.twitterLink = twitterLink;
         this.skypeContact = skypeContact;
     }
+
+	public Contact(ContactEntity contactEntity) {
+		this.id = contactEntity.getId();
+		this.name = contactEntity.getName();
+		this.surname = contactEntity.getSurname();
+		this.phone = contactEntity.getPhone();
+		this.photoPath = contactEntity.getPhotoPath();
+		this.email = contactEntity.getEmail();
+		this.twitterLink = contactEntity.getTwitterLink();
+		this.skypeContact = contactEntity.getSkypeContact();
+	}
 }
