@@ -18,7 +18,7 @@ public class DeletePhotoUserCase {
 				throw new IllegalArgumentException("File name is invalid.");
 			}
 		
-			photoServicePort.delete(fileName);
+			this.photoServicePort.delete(fileName);
 	 	} catch (Exception e) {
 			log.error("File is invalid", e);
         }

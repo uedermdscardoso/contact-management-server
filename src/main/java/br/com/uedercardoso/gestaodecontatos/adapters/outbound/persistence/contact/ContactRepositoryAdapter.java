@@ -1,5 +1,7 @@
 package br.com.uedercardoso.gestaodecontatos.adapters.outbound.persistence.contact;
 
+import java.util.List;
+
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +20,18 @@ public class ContactRepositoryAdapter implements ContactRepositoryPort {
     }
 
 	@Override
-	@NonNull
+	public List<Contact> findAll() {
+		
+		final List<ContactEntity> contactEntities = this.repository.findAll();
+		
+		final List<Contact> contacts = contactEntities.stream()
+			.map(items -> mapper.toDomain(items)) 
+			.toList();
+
+		return contacts;
+	}
+
+	@Override
 	public Contact findById(Integer id) {
 		
 		final ContactEntity contactEntity = this.repository.findById(id).orElse(null);
@@ -28,6 +41,41 @@ public class ContactRepositoryAdapter implements ContactRepositoryPort {
 		}
 
 		return mapper.toDomain(contactEntity);
+	}
+
+	@Override
+	public List<Contact> findByName(String name) {
+		return this.repository.findByName(name);
+	}
+
+	@Override
+	public List<Contact> findBySurname(String surname) {
+		return this.repository.findBySurname(surname);
+	}
+
+	@Override
+	public List<Contact> findByPhone(String phone) {
+		return this.repository.findByPhone(phone);
+	}
+
+	@Override
+	public List<Contact> findContactById() {
+		return this.repository.findContactById();
+	}
+
+	@Override
+	public List<Contact> findContactByName() {
+		return this.repository.findContactByName();
+	}
+
+	@Override
+	public List<Contact> findContactBySurname() {
+		return this.repository.findContactBySurname();
+	}
+
+	@Override
+	public List<Contact> findContactByPhone() {
+		return this.repository.findContactByPhone();
 	}
 
     @Override

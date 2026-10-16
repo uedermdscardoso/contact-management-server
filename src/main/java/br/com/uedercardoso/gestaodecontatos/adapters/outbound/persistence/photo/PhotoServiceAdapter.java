@@ -1,10 +1,10 @@
 package br.com.uedercardoso.gestaodecontatos.adapters.outbound.persistence.photo;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.uedercardoso.gestaodecontatos.core.ports.PhotoServicePort;
@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
@@ -31,7 +33,7 @@ public class PhotoServiceAdapter implements PhotoServicePort {
     }
 	
 	@Override
-	public Optional<String> save(MultipartFile file, String contentType, String fileName) {
+	public String save(MultipartFile file, String contentType, String fileName) {
 		try {
 			byte[] data = file.getBytes();
 
@@ -50,10 +52,9 @@ public class PhotoServiceAdapter implements PhotoServicePort {
 
 			String url = endpoint + "/" + bucketName + "/" + name;
 
-			return Optional.of(url);
+			return url;
         } catch (S3Exception | IOException e) {
-			log.error("Error occurred while uploading file to S3/Garage: ", e);
-			return Optional.empty();
+			throw new RuntimeException("Error occurred while uploading file to S3/Garage: " + e.getMessage(), e);
         }
 	}
 	
@@ -69,7 +70,29 @@ public class PhotoServiceAdapter implements PhotoServicePort {
             
             System.out.println("File successfully deleted: " + fileName);
         } catch (S3Exception e) {
-            throw new RuntimeException("Error occurred while deleting file to S3/Garage: " + e.awsErrorDetails().errorMessage(), e);
+			log.error("Error occurred while deleting file to S3/Garage", e);
+        }
+	}
+
+	@Override
+	@NonNull
+	public Boolean exists(String fileName) {
+		try {
+            HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileName)
+                    .build();
+
+            s3Client.headObject(headObjectRequest);
+            
+			return true;
+        } catch(NoSuchKeyException e) {
+            return false;
+        } catch(S3Exception e) {
+            if(e.statusCode() == 404) {
+                return false;
+            }
+        	throw new RuntimeException("Error checking for file existence in Garage: " + e.awsErrorDetails().errorMessage(), e);
         }
 	}
 }

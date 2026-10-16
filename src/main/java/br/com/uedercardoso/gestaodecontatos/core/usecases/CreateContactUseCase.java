@@ -30,6 +30,6 @@ public class CreateContactUseCase {
         
 		Contact contact = new Contact(name, surname, phone, photoPath, email, twitterLink, skypeContact);
 		
-		return contactRepositoryPort.save(contact);
+		return this.contactRepositoryPort.save(contact);
     }
 }
