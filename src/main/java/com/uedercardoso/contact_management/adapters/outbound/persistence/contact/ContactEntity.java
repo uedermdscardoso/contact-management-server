@@ -36,12 +36,12 @@ public class ContactEntity {
 	private String phone;
 	
 	@Column(length=255,nullable=true)
-	private String photoPath; 
+	private String attachmentPath; 
 	
 	@Column(length=50, nullable=true)
 	private String email; 
 	
-	@Column(length=30, nullable=true)
+	@Column(length=50, nullable=true)
 	private String twitterLink;
 	
 	@Column(length=30, nullable=true)
@@ -51,7 +51,7 @@ public class ContactEntity {
 		this.name = contact.getName();
 		this.surname = contact.getSurname();
 		this.phone = contact.getPhone();
-		this.photoPath = contact.getPhotoPath();
+		this.attachmentPath = contact.getAttachmentPath();
 		this.email = contact.getEmail();
 		this.twitterLink = contact.getTwitterLink();
 		this.skypeContact = contact.getSkypeContact();
@@ -62,7 +62,7 @@ public class ContactEntity {
 		this.name = contact.getName();
 		this.surname = contact.getSurname();
 		this.phone = contact.getPhone();
-		this.photoPath = contact.getPhotoPath();
+		this.attachmentPath = contact.getAttachmentPath();
 		this.email = contact.getEmail();
 		this.twitterLink = contact.getTwitterLink();
 		this.skypeContact = contact.getSkypeContact();

@@ -4,16 +4,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.uedercardoso.contact_management.adapters.outbound.persistence.contact.ContactEntityMapper;
+import com.uedercardoso.contact_management.core.ports.AttachmentServicePort;
 import com.uedercardoso.contact_management.core.ports.ContactRepositoryPort;
-import com.uedercardoso.contact_management.core.ports.PhotoServicePort;
-import com.uedercardoso.contact_management.core.usecases.CheckPhotoUserCase;
+import com.uedercardoso.contact_management.core.usecases.CheckAttachmentUseCase;
 import com.uedercardoso.contact_management.core.usecases.CreateContactUseCase;
+import com.uedercardoso.contact_management.core.usecases.DeleteAttachmentUseCase;
 import com.uedercardoso.contact_management.core.usecases.DeleteContactUseCase;
-import com.uedercardoso.contact_management.core.usecases.DeletePhotoUserCase;
-import com.uedercardoso.contact_management.core.usecases.FilterContactUserCase;
-import com.uedercardoso.contact_management.core.usecases.GetAllContactUserCase;
-import com.uedercardoso.contact_management.core.usecases.GetContactUserCase;
-import com.uedercardoso.contact_management.core.usecases.SavePhotoUserCase;
+import com.uedercardoso.contact_management.core.usecases.FilterContactUseCase;
+import com.uedercardoso.contact_management.core.usecases.GetAllContactUseCase;
+import com.uedercardoso.contact_management.core.usecases.GetContactUseCase;
+import com.uedercardoso.contact_management.core.usecases.SaveAttachmentUseCase;
 import com.uedercardoso.contact_management.core.usecases.SortContactListUseCase;
 import com.uedercardoso.contact_management.core.usecases.UpdateContactUserCase;
 
@@ -21,8 +21,8 @@ import com.uedercardoso.contact_management.core.usecases.UpdateContactUserCase;
 public class BeanConfig {
 	
 	@Bean
-    public CheckPhotoUserCase checkPhotoUseCase(PhotoServicePort photoServicePort) {
-        return new CheckPhotoUserCase(photoServicePort);
+    public CheckAttachmentUseCase checkAttachmentUseCase(AttachmentServicePort attachmentServicePort) {
+        return new CheckAttachmentUseCase(attachmentServicePort);
     }
 
     @Bean
@@ -36,28 +36,28 @@ public class BeanConfig {
 	}
 
 	@Bean
-	public DeletePhotoUserCase deletePhotoUserCase(PhotoServicePort photoServicePort) {
-		return new DeletePhotoUserCase(photoServicePort);
+	public DeleteAttachmentUseCase deleteAttachmentUserCase(AttachmentServicePort attachmentServicePort) {
+		return new DeleteAttachmentUseCase(attachmentServicePort);
 	}
 
 	@Bean
-	public FilterContactUserCase filterContactUserCase(ContactRepositoryPort contactRepositoryPort) {
-		return new FilterContactUserCase(contactRepositoryPort);
+	public FilterContactUseCase filterContactUserCase(ContactRepositoryPort contactRepositoryPort) {
+		return new FilterContactUseCase(contactRepositoryPort);
 	}
 
 	@Bean
-	public GetAllContactUserCase getAllContactUserCase(ContactRepositoryPort contactRepositoryPort) {
-		return new GetAllContactUserCase(contactRepositoryPort);
+	public GetAllContactUseCase getAllContactUserCase(ContactRepositoryPort contactRepositoryPort) {
+		return new GetAllContactUseCase(contactRepositoryPort);
 	}
 
 	@Bean
-	public GetContactUserCase getContactUserCase(ContactRepositoryPort contactRepositoryPort) {
-		return new GetContactUserCase(contactRepositoryPort);
+	public GetContactUseCase getContactUserCase(ContactRepositoryPort contactRepositoryPort) {
+		return new GetContactUseCase(contactRepositoryPort);
 	}
 
 	@Bean
-	public SavePhotoUserCase savePhotoUserCase(PhotoServicePort photoServicePort) {
-		return new SavePhotoUserCase(photoServicePort);
+	public SaveAttachmentUseCase saveAttachmentUserCase(AttachmentServicePort attachmentServicePort) {
+		return new SaveAttachmentUseCase(attachmentServicePort);
 	}
 
 	@Bean

@@ -17,7 +17,7 @@ public class Contact {
 	private String name;
 	private String surname;
 	private String phone;
-	private String photoPath; 
+	private String attachmentPath; 
 	private String email; 
 	private String twitterLink;
 	private String skypeContact;
@@ -28,14 +28,14 @@ public class Contact {
 		this.email = email;
 	}
 
-	public Contact(String name, String surname, String phone, String photoPath, String email, String twitterLink, String skypeContact) {
+	public Contact(String name, String surname, String phone, String attachmentPath, String email, String twitterLink, String skypeContact) {
         if (name == null || name.length() < 3 || name.length() > 15) {
             throw new IllegalArgumentException("The name must be between 3 and 15 characters.");
         }
         this.name = name;
         this.surname = surname;
         this.phone = phone;
-        this.photoPath = photoPath;
+        this.attachmentPath = attachmentPath;
         this.email = email;
         this.twitterLink = twitterLink;
         this.skypeContact = skypeContact;
@@ -46,7 +46,7 @@ public class Contact {
 		this.name = contactEntity.getName();
 		this.surname = contactEntity.getSurname();
 		this.phone = contactEntity.getPhone();
-		this.photoPath = contactEntity.getPhotoPath();
+		this.attachmentPath = contactEntity.getAttachmentPath();
 		this.email = contactEntity.getEmail();
 		this.twitterLink = contactEntity.getTwitterLink();
 		this.skypeContact = contactEntity.getSkypeContact();

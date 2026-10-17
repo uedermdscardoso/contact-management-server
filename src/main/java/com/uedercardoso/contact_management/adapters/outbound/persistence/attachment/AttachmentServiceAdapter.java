@@ -1,14 +1,15 @@
-package com.uedercardoso.contact_management.adapters.outbound.persistence.photo;
+package com.uedercardoso.contact_management.adapters.outbound.persistence.attachment;
 
 import java.io.IOException;
 import java.util.UUID;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.uedercardoso.contact_management.core.ports.PhotoServicePort;
+import com.uedercardoso.contact_management.core.ports.AttachmentServicePort;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -20,7 +21,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Slf4j
 @Component
-public class PhotoServiceAdapter implements PhotoServicePort {
+public class AttachmentServiceAdapter implements AttachmentServicePort {
 	
 	private final S3Client s3Client;
 
@@ -30,17 +31,20 @@ public class PhotoServiceAdapter implements PhotoServicePort {
 	@Value("${aws.s3.endpoint}")
     private String endpoint;
 
-    public PhotoServiceAdapter(S3Client s3Client) {
+    public AttachmentServiceAdapter(S3Client s3Client) {
         this.s3Client = s3Client;
     }
 	
 	@Override
-	public String save(MultipartFile file, String contentType, String fileName) {
+	public String save(MultipartFile file) {
 		try {
 			byte[] data = file.getBytes();
-
+			
 			final String id = UUID.randomUUID().toString();
-			final String name = fileName+"-"+id;
+			String contentType = file.getContentType();
+			String fileName = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf(".")-1);
+			String extension = getExtension(file);
+			final String name = fileName+"-"+id+"."+extension;
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
 				.bucket(bucketName)
@@ -96,5 +100,11 @@ public class PhotoServiceAdapter implements PhotoServicePort {
             }
         	throw new RuntimeException("Error checking for file existence in Garage: " + e.awsErrorDetails().errorMessage(), e);
         }
+	}
+
+	public String getExtension(MultipartFile file) {
+    	String nomeOriginal = file.getOriginalFilename();
+
+    	return FilenameUtils.getExtension(nomeOriginal);
 	}
 }
