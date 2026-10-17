@@ -53,6 +53,78 @@ Start the server
 
 Configure your garage
 
+Generate a rpc_secret and admin_token
+```
+openssl rand -hex 32
+```
+
+Create a folder named docker-composes
+```
+mkdir docker-composes
+```
+
+Create a folder named garage
+```
+mkdir garage
+```
+
+
+Create a garage.toml file
+```
+metadata_dir = "/var/lib/garage/meta"
+data_dir = "/var/lib/garage/data"
+
+db_engine = "lmdb"
+replication_factor = 1
+consistency_mode = "consistent"
+
+rpc_bind_addr = "[::]:3901"
+rpc_public_addr = "127.0.0.1:3901"
+rpc_secret = "your_rpc_secret"
+
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "[::]:3900"
+root_domain = ".s3.localhost"
+
+[admin]
+api_bind_addr = "[::]:3903"
+admin_token = "your_admin_token"
+```
+
+Create a docker-compose.yml file
+```
+version: '3.8'
+
+services:
+  garage:
+    image: dxflrs/garage:v2.0.0
+    container_name: garage
+    restart: unless-stopped
+    ports:
+      - "3900:3900" # S3 API Gateway
+      - "3901:3901" # Internal RPC port
+      - "3903:3903" # Admin Portal
+    volumes:
+      - ./garage.toml:/etc/garage.toml:ro
+      - garage_data:/var/lib/garage/data
+      - garage_meta:/var/lib/garage/meta
+
+volumes:
+  garage_data:
+  garage_meta:
+```
+
+Stop Docker Compose
+```
+docker compose down -v
+```
+
+Run Docker Compose
+```
+docker compose up -d
+```
+
 Find the Node ID of your Garage container
 ```
 docker exec -it garage /garage node id
