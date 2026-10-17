@@ -5,10 +5,10 @@ import java.util.List;
 import com.uedercardoso.contact_management.core.domain.Contact;
 import com.uedercardoso.contact_management.core.ports.ContactRepositoryPort;
 
-public class GetAllContactUserCase {
+public class GetAllContactUseCase {
 	private final ContactRepositoryPort contactRepositoryPort;
 
-    public GetAllContactUserCase(ContactRepositoryPort contactRepositoryPort) {
+    public GetAllContactUseCase(ContactRepositoryPort contactRepositoryPort) {
         this.contactRepositoryPort = contactRepositoryPort;
     }
 

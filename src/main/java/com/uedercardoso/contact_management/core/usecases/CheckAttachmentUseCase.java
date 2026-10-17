@@ -1,15 +1,15 @@
 package com.uedercardoso.contact_management.core.usecases;
 
-import com.uedercardoso.contact_management.core.ports.PhotoServicePort;
+import com.uedercardoso.contact_management.core.ports.AttachmentServicePort;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class CheckPhotoUserCase {
+public class CheckAttachmentUseCase {
 	
-	private final PhotoServicePort photoServicePort;
+	private final AttachmentServicePort attachmentServicePort;
 	
-	public CheckPhotoUserCase(PhotoServicePort photoServicePort) {
-		this.photoServicePort = photoServicePort;
+	public CheckAttachmentUseCase(AttachmentServicePort attachmentServicePort) {
+		this.attachmentServicePort = attachmentServicePort;
 	}
 
 	public Boolean execute(String fileName) {
@@ -18,7 +18,7 @@ public class CheckPhotoUserCase {
 				throw new IllegalArgumentException("File name is invalid.");
 			}
 		
-			return this.photoServicePort.exists(fileName);
+			return this.attachmentServicePort.exists(fileName);
 	 	} catch (Exception e) {
 			log.error("File does not exist", e);
 

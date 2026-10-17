@@ -5,10 +5,10 @@ import java.util.List;
 import com.uedercardoso.contact_management.core.domain.Contact;
 import com.uedercardoso.contact_management.core.ports.ContactRepositoryPort;
 
-public class FilterContactUserCase {
+public class FilterContactUseCase {
 	private final ContactRepositoryPort contactRepositoryPort;
 
-    public FilterContactUserCase(ContactRepositoryPort contactRepositoryPort) {
+    public FilterContactUseCase(ContactRepositoryPort contactRepositoryPort) {
         this.contactRepositoryPort = contactRepositoryPort;
     }
 

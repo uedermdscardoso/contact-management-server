@@ -21,16 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.uedercardoso.contact_management.core.domain.Contact;
-import com.uedercardoso.contact_management.core.usecases.CheckPhotoUserCase;
+import com.uedercardoso.contact_management.core.usecases.CheckAttachmentUseCase;
 import com.uedercardoso.contact_management.core.usecases.CreateContactUseCase;
+import com.uedercardoso.contact_management.core.usecases.DeleteAttachmentUseCase;
 import com.uedercardoso.contact_management.core.usecases.DeleteContactUseCase;
-import com.uedercardoso.contact_management.core.usecases.DeletePhotoUserCase;
-import com.uedercardoso.contact_management.core.usecases.FilterContactUserCase;
-import com.uedercardoso.contact_management.core.usecases.GetAllContactUserCase;
-import com.uedercardoso.contact_management.core.usecases.GetContactUserCase;
-import com.uedercardoso.contact_management.core.usecases.SavePhotoUserCase;
+import com.uedercardoso.contact_management.core.usecases.GetAllContactUseCase;
+import com.uedercardoso.contact_management.core.usecases.GetContactUseCase;
+import com.uedercardoso.contact_management.core.usecases.SaveAttachmentUseCase;
 import com.uedercardoso.contact_management.core.usecases.SortContactListUseCase;
 import com.uedercardoso.contact_management.core.usecases.UpdateContactUserCase;
+import com.uedercardoso.contact_management.core.usecases.FilterContactUseCase;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -39,37 +39,38 @@ import lombok.extern.slf4j.Slf4j;
 @CrossOrigin(origins = "http://localhost:3000") 
 public class ContactController {
 
-	private final GetContactUserCase getContactUserCase;
-	private final GetAllContactUserCase getAllContactUserCase;
+	private final GetContactUseCase getContactUseCase;
+	private final GetAllContactUseCase getAllContactUseCase;
 	private final SortContactListUseCase sortContactListUseCase;
-	private final FilterContactUserCase filterContactUserCase;
+	private final FilterContactUseCase filterContactUseCase;
 	private final CreateContactUseCase createContactUseCase;
-	private final UpdateContactUserCase updateContactUserCase;
+	private final UpdateContactUserCase updateContactUseCase;
 	private final DeleteContactUseCase deleteContactUseCase;
-	private final SavePhotoUserCase savePhotoUserCase;
-	private final CheckPhotoUserCase checkPhotoUserCase;
-	private final DeletePhotoUserCase deletePhotoUserCase;
+	private final SaveAttachmentUseCase saveAttachmentUseCase;
+	private final CheckAttachmentUseCase checkAttachmentUseCase;
+	private final DeleteAttachmentUseCase deleteAttachmentUseCase;
 
-	public ContactController(CreateContactUseCase createContactUseCase, GetContactUserCase getContactUserCase, GetAllContactUserCase getAllContactUserCase,
-		SortContactListUseCase sortContactListUseCase, FilterContactUserCase filterContactUserCase, UpdateContactUserCase updateContactUserCase, SavePhotoUserCase savePhotoUserCase, 
-		CheckPhotoUserCase checkPhotoUserCase, DeletePhotoUserCase deletePhotoUserCase, DeleteContactUseCase deleteContactUseCase) {
+	public ContactController(CreateContactUseCase createContactUseCase, GetContactUseCase getContactUseCase, GetAllContactUseCase getAllContactUseCase,
+		SortContactListUseCase sortContactListUseCase, FilterContactUseCase filterContactUseCase, UpdateContactUserCase updateContactUseCase, 
+		SaveAttachmentUseCase saveAttachmentUseCase, CheckAttachmentUseCase checkAttachmentUseCase, DeleteAttachmentUseCase deleteAttachmentUseCase, 
+		DeleteContactUseCase deleteContactUseCase) {
 		this.createContactUseCase = createContactUseCase;
-		this.getContactUserCase = getContactUserCase;
-		this.getAllContactUserCase = getAllContactUserCase;
+		this.getContactUseCase = getContactUseCase;
+		this.getAllContactUseCase = getAllContactUseCase;
 		this.sortContactListUseCase = sortContactListUseCase;
-		this.filterContactUserCase = filterContactUserCase;
-		this.updateContactUserCase = updateContactUserCase;
+		this.filterContactUseCase = filterContactUseCase;
+		this.updateContactUseCase = updateContactUseCase;
 		this.deleteContactUseCase = deleteContactUseCase;
-		this.savePhotoUserCase = savePhotoUserCase;
-		this.checkPhotoUserCase = checkPhotoUserCase;
-		this.deletePhotoUserCase = deletePhotoUserCase;
+		this.saveAttachmentUseCase = saveAttachmentUseCase;
+		this.checkAttachmentUseCase = checkAttachmentUseCase;
+		this.deleteAttachmentUseCase = deleteAttachmentUseCase;
 	}
 
 	@PostMapping("/save")
 	public ResponseEntity<Contact> save(@Valid @RequestBody ContactRequestDTO contactDTO) {	
 		try {
 				        
-			final Contact contact = this.createContactUseCase.execute(contactDTO.name(), contactDTO.surname(), contactDTO.phone(), contactDTO.photoPath(), contactDTO.email(), contactDTO.twitterLink(), contactDTO.skypeContact());
+			final Contact contact = this.createContactUseCase.execute(contactDTO.name(), contactDTO.surname(), contactDTO.phone(), contactDTO.attachmentPath, contactDTO.email(), contactDTO.twitterLink(), contactDTO.skypeContact());
 
 			return ResponseEntity.ok(contact);
 			
@@ -79,18 +80,18 @@ public class ContactController {
 		}
 	}
 
-	@PostMapping("/upload/photo")
-	public ResponseEntity<String> savePhoto(@Valid @RequestParam MultipartFile file, @RequestParam String contentType, @RequestParam String fileName) {
+	@PostMapping("/upload/attachment")
+	public ResponseEntity<String> saveAttachment(@Valid @RequestParam MultipartFile file) {
 
-		final String photoUrl = this.savePhotoUserCase.execute(file, contentType, fileName);
+		final String attachmentUrl = this.saveAttachmentUseCase.execute(file);
 
-		return ResponseEntity.ok(photoUrl);
+		return ResponseEntity.ok(attachmentUrl);
 	}
 
-	@DeleteMapping("/delete/photo")
-	public ResponseEntity<Void> deletePhoto(@RequestParam String fileName) {
+	@DeleteMapping("/delete/attachment")
+	public ResponseEntity<Void> deleteAttachment(@RequestParam String fileName) {
 
-		this.deletePhotoUserCase.execute(fileName);
+		this.deleteAttachmentUseCase.execute(fileName);
 
 		return ResponseEntity.ok().build();
 	}
@@ -98,27 +99,29 @@ public class ContactController {
 	@PutMapping("/{id}/update")
 	public ResponseEntity<Contact> update(@PathVariable("id") Integer id, @RequestBody @Valid Contact contact) {
 		
-		final Contact contactEntity = this.updateContactUserCase.execute(id, contact.getName(), contact.getSurname(), contact.getPhone(), contact.getPhotoPath(), contact.getEmail(), contact.getTwitterLink(), contact.getSkypeContact());
+		final Contact contactEntity = this.updateContactUseCase.execute(id, contact.getName(), contact.getSurname(), contact.getPhone(), contact.getAttachmentPath(), contact.getEmail(), contact.getTwitterLink(), contact.getSkypeContact());
 		
 		return ResponseEntity.ok(contactEntity);		
 	}
 	
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/{id}/delete")
 	public ResponseEntity<Void> delete(@PathVariable("id") Integer id) {
 		
-		final Contact contact = this.getContactUserCase.execute(id);
+		final Contact contact = this.getContactUseCase.execute(id);
 
 		if(contact == null) {
 			return ResponseEntity.notFound().build();
 		}
 
-		final String filename = this.getFilename(contact.getPhotoPath());
+		if(contact.getAttachmentPath() != null && !contact.getAttachmentPath().isEmpty()) {
+			final String filename = this.getFilename(contact.getAttachmentPath());
 
-		final Boolean hasFile = this.checkPhotoUserCase.execute(filename);
-		if(hasFile) {
-			this.deletePhotoUserCase.execute(filename);
+			final Boolean hasFile = this.checkAttachmentUseCase.execute(filename);
+			if(hasFile) {
+				this.deleteAttachmentUseCase.execute(filename);
+			}	
 		}
-
+		
 		this.deleteContactUseCase.execute(id);
 
 		return ResponseEntity.ok().build();
@@ -147,7 +150,7 @@ public class ContactController {
 				break;
 			}
 			default:{
-				contacts = this.getAllContactUserCase.execute();
+				contacts = this.getAllContactUseCase.execute();
 				break;
 			}
 		}
@@ -159,7 +162,7 @@ public class ContactController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Contact> getContact(@PathVariable("id") Integer id) {
 		
-		final Contact contact = this.getContactUserCase.execute(id);
+		final Contact contact = this.getContactUseCase.execute(id);
 
 		return ResponseEntity.ok(contact);
 	}
@@ -172,15 +175,15 @@ public class ContactController {
 		try {
 			switch(attributes.attribute) {
 				case "NAME":{
-					contacts = this.filterContactUserCase.executeFindByName(attributes.value);
+					contacts = this.filterContactUseCase.executeFindByName(attributes.value);
 					break;
 				}
 				case "SURNAME":{
-					contacts = this.filterContactUserCase.executeFindBySurname(attributes.value);
+					contacts = this.filterContactUseCase.executeFindBySurname(attributes.value);
 					break;
 				}
 				case "PHONE":{
-					contacts = this.filterContactUserCase.executeFindByPhone(attributes.value);
+					contacts = this.filterContactUseCase.executeFindByPhone(attributes.value);
 					break;
 				}
 				default:
@@ -197,7 +200,7 @@ public class ContactController {
 	}
 	
 	public String getFilename(String path) {
-		int aux = path.lastIndexOf('.'); 
+		int aux = path.lastIndexOf('/'); 
 		String fileName = path.substring(aux+1, path.length());
 		
 		return fileName;
@@ -214,9 +217,9 @@ public class ContactController {
 		String email,
 		@NotEmpty(message = "The phone cannot be empty")
 		String phone,
-		String photoPath,
+		String attachmentPath,
 		@NotEmpty(message = "The twitter link cannot be empty")
-		@Size(max = 30, message = "The twitter link must have a maximum of 30 characters")
+		@Size(max = 50, message = "The twitter link must have a maximum of 50 characters")
 		String twitterLink,
 		@NotEmpty(message = "The skype contact cannot be empty")
 		@Size(max = 30, message = "The skype contact must have a maximum of 30 characters")
