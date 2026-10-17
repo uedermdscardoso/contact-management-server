@@ -190,6 +190,31 @@ Grant permission for the key to use the bucket
 docker exec -it garage /garage bucket allow --read --write {meu-bucket} --key {my-key-s3}
 ```
 
+Go to the Downloads folder to download the AWS CLI
+```
+cd ~/Downloads
+```
+
+Download AWS CLI
+```
+curl "https://amazonaws.com" -o "awscliv2.zip"
+```
+
+Unzip AWS CLI
+```
+unzip awscliv2.zip
+```
+
+Install AWS CLI
+```
+sudo ./aws/install
+```
+
+Remove zip file
+```
+rm awscliv2.zip
+```
+
 Enter the AWS Access Key ID and AWS Secret Access Key
 ```
 aws configure
