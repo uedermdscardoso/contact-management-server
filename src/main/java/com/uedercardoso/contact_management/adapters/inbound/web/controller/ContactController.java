@@ -132,7 +132,7 @@ public class ContactController {
 		
 		List<Contact> contacts = new LinkedList<Contact>();
 			
-		switch(orderType) {
+		switch(orderType.toUpperCase()) {
 			case "ID":{
 				contacts = this.sortContactListUseCase.executeSortById();
 				break;
@@ -167,13 +167,13 @@ public class ContactController {
 		return ResponseEntity.ok(contact);
 	}
 	
-	@GetMapping("/search/{attribute}/{value}")
+	@GetMapping("/search")
 	public ResponseEntity<List<Contact>> findContactsByValue(@RequestBody @Valid AttributeRequestDTO attributes){
 		
 		List<Contact> contacts = new LinkedList<Contact>();
 		
 		try {
-			switch(attributes.attribute) {
+			switch(attributes.attribute.toUpperCase()) {
 				case "NAME":{
 					contacts = this.filterContactUseCase.executeFindByName(attributes.value);
 					break;
