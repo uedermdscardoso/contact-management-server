@@ -27,25 +27,25 @@ Install my-project with npm
 Clone the project
 
 ```bash
-  git clone https://link-to-project
+  git clone https://github.com/uedermdscardoso/contact-management-server.git
 ```
 
 Go to the project directory
 
 ```bash
-  cd my-project
+  cd contact-management-server
 ```
 
 Install dependencies
 
 ```bash
-  npm install
+  mvn clean install
 ```
 
 Start the server
 
 ```bash
-  npm run start
+  mvn spring-boot:run
 ```
 
 
