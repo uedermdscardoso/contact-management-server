@@ -49,32 +49,43 @@ Start the server
 ```
 
 
-## Configuration
+## Garage Configuration
 
 Configure your garage
 
+Find the Node ID of your Garage container
 ```
 docker exec -it garage /garage node id
 ```
 
+Assign the node to the Garage layout
 ```
 docker exec -it garage /garage layout assign -z dc1 -c 10G {node-id}
 ```
 
+Apply the layout
 ```
 docker exec -it garage /garage layout apply --version 1
 ```
 
+Create an access key (Access Key and Secret Key)
 ```
 docker exec -it garage /garage key create {my-key-s3}
 ```
 
+Create your first bucket
 ```
 docker exec -it garage /garage bucket create {meu-bucket}
 ```
 
+Grant permission for the key to use the bucket
 ```
 docker exec -it garage /garage bucket allow --read --write {meu-bucket} --key {my-key-s3}
+```
+
+Enter the AWS Access Key ID and AWS Secret Access Key
+```
+aws configure
 ```
 
 ## Trying the Garage APIs
