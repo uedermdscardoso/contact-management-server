@@ -107,9 +107,9 @@ public class ContactController {
 	}
 
 	@DeleteMapping("/delete/attachment")
-	public ResponseEntity<Void> deleteAttachment(@RequestParam String fileName) {
+	public ResponseEntity<Void> deleteAttachment(@RequestParam String filename) {
 
-		this.deleteAttachmentUseCase.execute(fileName);
+		this.deleteAttachmentUseCase.execute(filename);
 
 		return ResponseEntity.ok().build();
 	}
