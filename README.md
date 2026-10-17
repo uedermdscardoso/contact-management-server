@@ -13,32 +13,67 @@ The Angular project is cited below.
  - [Contact Managament Client - Angular](https://github.com/uedermdscardoso/contact-management-client)
 
 
-## Run Locally
+## MySQL Configuration
 
-Clone the project
-
-```bash
-  git clone https://github.com/uedermdscardoso/contact-management-server.git
+Create a folder named docker-composes
+```
+mkdir docker-composes
 ```
 
-Go to the project directory
-
-```bash
-  cd contact-management-server
+Enter the docker-composes folder
+```
+cd docker-composes
 ```
 
-Install dependencies
-
-```bash
-  mvn clean install
+Create a folder named MySQL
+```
+mkdir MySQL
 ```
 
-Start the server
-
-```bash
-  mvn spring-boot:run
+Enter the MySQL folder
+```
+cd MySQL
 ```
 
+Create a docker-compose.yml file
+```
+version: '3.8'
+
+services:
+  db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: master
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: admin
+    ports:
+      - "8081:80"
+```
+
+Run Docker Compose
+```
+docker compose up -d
+```
+
+Stop Docker Compose
+```
+docker compose down -v
+```
 
 ## Garage Configuration
 
@@ -49,9 +84,9 @@ Generate a rpc_secret and admin_token
 openssl rand -hex 32
 ```
 
-Create a folder named docker-composes
+Go back to the docker-composes folder
 ```
-mkdir docker-composes
+cd ../
 ```
 
 Create a folder named garage
@@ -59,6 +94,10 @@ Create a folder named garage
 mkdir garage
 ```
 
+Enter the garage folder
+```
+cd garage
+```
 
 Create a garage.toml file
 ```
@@ -106,14 +145,14 @@ volumes:
   garage_meta:
 ```
 
-Stop Docker Compose
-```
-docker compose down -v
-```
-
 Run Docker Compose
 ```
 docker compose up -d
+```
+
+Stop Docker Compose
+```
+docker compose down -v
 ```
 
 Find the Node ID of your Garage container
@@ -176,6 +215,33 @@ aws --endpoint-url http://localhost:3900 s3 cp s3://{bucket}/{file.txt} .
 Delete a file from the bucket
 ```
 aws --endpoint-url http://localhost:3900 s3 rm s3://{bucket}/{file.txt}
+```
+
+
+## Run Locally
+
+Clone the project
+
+```bash
+  git clone https://github.com/uedermdscardoso/contact-management-server.git
+```
+
+Go to the project directory
+
+```bash
+  cd contact-management-server
+```
+
+Install dependencies
+
+```bash
+  mvn clean install
+```
+
+Start the server
+
+```bash
+  mvn spring-boot:run
 ```
 
 
