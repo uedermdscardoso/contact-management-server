@@ -1,12 +1,14 @@
 package com.uedercardoso.contact_management.core.ports;
 
+import java.util.Optional;
+
 import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AttachmentServicePort {
 	
 	@NonNull
-	String save(MultipartFile file);	
+	Optional<String> save(MultipartFile file);	
 	
 	void delete(String fileName);
 
