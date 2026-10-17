@@ -72,7 +72,7 @@ docker compose up -d
 
 Access phpMyAdmin using the username "root" and password "admin," or the username "admin" and password "admin."
 ```
-    http://localhost:8081
+http://localhost:8081
 ```
 
 Stop Docker Compose
