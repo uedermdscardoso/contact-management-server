@@ -3,6 +3,7 @@ package com.uedercardoso.contact_management.core.usecases;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,13 +22,13 @@ public class SaveAttachmentUseCase {
 		this.attachmentServicePort = attachmentServicePort;
 	}
 
-	public String execute(MultipartFile file) {
+	public Optional<String> execute(MultipartFile file) {
 		try {
 			byte[] data = file.getBytes();
 			String extension = this.attachmentServicePort.getExtension(file);
 
 			if(data == null || data.length == 0) {
-				throw new IllegalArgumentException("Attachment data is invalid.");
+				return Optional.empty();
 			}
 
 			if(!allowedExtensions.contains(extension.toLowerCase())) {

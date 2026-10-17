@@ -2,11 +2,13 @@ package com.uedercardoso.contact_management.adapters.inbound.web.controller;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/contact")
-@CrossOrigin(origins = "http://localhost:3000") 
+@CrossOrigin(origins = "http://localhost:4200") 
 public class ContactController {
 
 	private final GetContactUseCase getContactUseCase;
@@ -66,11 +69,20 @@ public class ContactController {
 		this.deleteAttachmentUseCase = deleteAttachmentUseCase;
 	}
 
-	@PostMapping("/save")
-	public ResponseEntity<Contact> save(@Valid @RequestBody ContactRequestDTO contactDTO) {	
+	@PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<Contact> save(
+		@RequestPart("contact") @Valid ContactRequestDTO contactDTO,
+		@RequestPart("file") MultipartFile file) {	
 		try {
-				        
-			final Contact contact = this.createContactUseCase.execute(contactDTO.name(), contactDTO.surname(), contactDTO.phone(), contactDTO.attachmentPath, contactDTO.email(), contactDTO.twitterLink(), contactDTO.skypeContact());
+
+			final Optional<String> data = this.saveAttachmentUseCase.execute(file);
+			
+			String attachmentPath = null;
+			if(data.isPresent()) {
+				attachmentPath = data.get();
+			}
+			
+			final Contact contact = this.createContactUseCase.execute(contactDTO.name(), contactDTO.surname(), contactDTO.phone(), attachmentPath, contactDTO.email(), contactDTO.twitterLink(), contactDTO.skypeContact());
 
 			return ResponseEntity.ok(contact);
 			
@@ -82,10 +94,16 @@ public class ContactController {
 
 	@PostMapping("/upload/attachment")
 	public ResponseEntity<String> saveAttachment(@Valid @RequestParam MultipartFile file) {
-
-		final String attachmentUrl = this.saveAttachmentUseCase.execute(file);
-
-		return ResponseEntity.ok(attachmentUrl);
+		
+		final Optional<String> data = this.saveAttachmentUseCase.execute(file);
+		
+		if(data.isPresent()) {
+			final String attachmentPath = data.get();
+		
+			return ResponseEntity.ok(attachmentPath);
+		}
+		
+		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping("/delete/attachment")

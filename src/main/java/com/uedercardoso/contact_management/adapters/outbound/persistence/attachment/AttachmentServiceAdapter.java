@@ -1,6 +1,7 @@
 package com.uedercardoso.contact_management.adapters.outbound.persistence.attachment;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.io.FilenameUtils;
@@ -36,7 +37,7 @@ public class AttachmentServiceAdapter implements AttachmentServicePort {
     }
 	
 	@Override
-	public String save(MultipartFile file) {
+	public Optional<String> save(MultipartFile file) {
 		try {
 			byte[] data = file.getBytes();
 			
@@ -58,7 +59,7 @@ public class AttachmentServiceAdapter implements AttachmentServicePort {
 
 			String url = endpoint + "/" + bucketName + "/" + name;
 
-			return url;
+			return Optional.of(url);
         } catch (S3Exception | IOException e) {
 			throw new RuntimeException("Error occurred while uploading file to S3/Garage: " + e.getMessage(), e);
         }
