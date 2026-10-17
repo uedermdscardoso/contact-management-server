@@ -70,6 +70,11 @@ Run Docker Compose
 docker compose up -d
 ```
 
+Access phpMyAdmin using the username "root" and password "admin," or the username "admin" and password "admin."
+```
+    http://localhost:8081
+```
+
 Stop Docker Compose
 ```
 docker compose down -v
@@ -145,14 +150,14 @@ volumes:
   garage_meta:
 ```
 
-Run Docker Compose
-```
-docker compose up -d
-```
-
 Stop Docker Compose
 ```
 docker compose down -v
+```
+
+Run Docker Compose
+```
+docker compose up -d
 ```
 
 Find the Node ID of your Garage container
