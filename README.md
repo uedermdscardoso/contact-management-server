@@ -13,15 +13,6 @@ The Angular project is cited below.
  - [Contact Managament Client - Angular](https://github.com/uedermdscardoso/contact-management-client)
 
 
-## Installation
-
-Install my-project with npm
-
-```bash
-  npm install my-project
-  cd my-project
-```
-    
 ## Run Locally
 
 Clone the project
