@@ -12,6 +12,10 @@ public class FilterContactUseCase {
         this.contactRepositoryPort = contactRepositoryPort;
     }
 
+	public List<Contact> executeFindByValue(String value) {
+		return this.contactRepositoryPort.findByValue(value);
+	} 
+
     public List<Contact> executeFindByName(String name) {
 		return this.contactRepositoryPort.findByName(name);
     }

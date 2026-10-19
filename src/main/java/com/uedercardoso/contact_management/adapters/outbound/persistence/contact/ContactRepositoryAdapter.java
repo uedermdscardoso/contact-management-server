@@ -69,6 +69,15 @@ public class ContactRepositoryAdapter implements ContactRepositoryPort {
 	}
 
 	@Override
+	public List<Contact> findByValue(String value) {
+		List<ContactEntity> contacts = this.repository.findByValue(value);
+		
+		return contacts.stream()
+			.map(mapper::toDomain)
+			.toList();	
+	}
+
+	@Override
 	public List<Contact> findContactById() {
 		List<ContactEntity> contactEntities = this.repository.findContactById();
 		

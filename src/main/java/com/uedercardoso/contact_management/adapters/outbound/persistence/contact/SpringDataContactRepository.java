@@ -17,6 +17,9 @@ public interface SpringDataContactRepository extends JpaRepository<ContactEntity
 	@Query(value="SELECT c.* FROM contacts c WHERE c.phone LIKE CONCAT(:phone, '%')",nativeQuery=true)
 	public List<ContactEntity> findByPhone(@Param("phone") String phone);
 
+	@Query(value="SELECT c.* FROM contacts c WHERE c.name LIKE CONCAT('%', :value, '%') OR c.surname LIKE CONCAT('%', :value, '%') OR c.phone LIKE CONCAT('%', :value, '%') OR c.email LIKE CONCAT('%', :value, '%') OR c.twitter_link LIKE CONCAT('%', :value, '%') OR c.skype_contact LIKE CONCAT('%', :value, '%')",nativeQuery=true)
+	public List<ContactEntity> findByValue(@Param("value") String value);
+
 	@Query(value="SELECT c.* FROM contacts c ORDER BY c.id",nativeQuery=true)
 	public List<ContactEntity> findContactById();
 
