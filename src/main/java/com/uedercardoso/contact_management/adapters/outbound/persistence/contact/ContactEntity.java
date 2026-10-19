@@ -38,13 +38,13 @@ public class ContactEntity {
 	@Column(length=255,nullable=true)
 	private String attachmentPath; 
 	
-	@Column(length=50, nullable=true)
+	@Column(length=50, nullable=false)
 	private String email; 
 	
-	@Column(length=50, nullable=true)
+	@Column(name="twitter_link",length=50, nullable=true)
 	private String twitterLink;
 	
-	@Column(length=30, nullable=true)
+	@Column(name="skype_contact", length=30, nullable=true)
 	private String skypeContact;
 
 	public ContactEntity(Contact contact) {

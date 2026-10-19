@@ -8,6 +8,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -35,6 +37,11 @@ import com.uedercardoso.contact_management.core.usecases.SortContactListUseCase;
 import com.uedercardoso.contact_management.core.usecases.UpdateContactUserCase;
 import com.uedercardoso.contact_management.core.usecases.FilterContactUseCase;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 @Slf4j
 @RestController
@@ -53,10 +60,15 @@ public class ContactController {
 	private final CheckAttachmentUseCase checkAttachmentUseCase;
 	private final DeleteAttachmentUseCase deleteAttachmentUseCase;
 
+	private final S3Client s3Client;
+
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
+
 	public ContactController(CreateContactUseCase createContactUseCase, GetContactUseCase getContactUseCase, GetAllContactUseCase getAllContactUseCase,
 		SortContactListUseCase sortContactListUseCase, FilterContactUseCase filterContactUseCase, UpdateContactUserCase updateContactUseCase, 
 		SaveAttachmentUseCase saveAttachmentUseCase, CheckAttachmentUseCase checkAttachmentUseCase, DeleteAttachmentUseCase deleteAttachmentUseCase, 
-		DeleteContactUseCase deleteContactUseCase) {
+		DeleteContactUseCase deleteContactUseCase, S3Client s3Client) {
 		this.createContactUseCase = createContactUseCase;
 		this.getContactUseCase = getContactUseCase;
 		this.getAllContactUseCase = getAllContactUseCase;
@@ -67,19 +79,22 @@ public class ContactController {
 		this.saveAttachmentUseCase = saveAttachmentUseCase;
 		this.checkAttachmentUseCase = checkAttachmentUseCase;
 		this.deleteAttachmentUseCase = deleteAttachmentUseCase;
+		this.s3Client = s3Client;
 	}
 
 	@PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Contact> save(
 		@RequestPart("contact") @Valid ContactRequestDTO contactDTO,
-		@RequestPart("file") MultipartFile file) {	
+		MultipartFile file) {	
 		try {
 
-			final Optional<String> data = this.saveAttachmentUseCase.execute(file);
-			
 			String attachmentPath = null;
-			if(data.isPresent()) {
-				attachmentPath = data.get();
+			if(file != null) {
+				final Optional<String> data = this.saveAttachmentUseCase.execute(file);
+			
+				if(data.isPresent()) {
+					attachmentPath = data.get();
+				}
 			}
 			
 			final Contact contact = this.createContactUseCase.execute(contactDTO.name(), contactDTO.surname(), contactDTO.phone(), attachmentPath, contactDTO.email(), contactDTO.twitterLink(), contactDTO.skypeContact());
@@ -143,6 +158,45 @@ public class ContactController {
 		this.deleteContactUseCase.execute(id);
 
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/file")
+    public ResponseEntity<InputStreamResource> getFile(@RequestParam String filename) {
+        try {
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(filename)
+                    .build();
+
+            ResponseInputStream<GetObjectResponse> s3objectResponse = s3Client.getObject(getObjectRequest);
+            GetObjectResponse response = s3objectResponse.response();
+
+            MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+            if (response.contentType() != null) {
+                mediaType = MediaType.parseMediaType(response.contentType());
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(mediaType)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                    .body(new InputStreamResource(s3objectResponse));
+
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+	@GetMapping("/value/{value}")
+	public ResponseEntity<List<Contact>> findByValue(@PathVariable String value) {
+		
+		final List<Contact> contacts = this.filterContactUseCase.executeFindByValue(value);
+
+		if(contacts == null || contacts.isEmpty()) {
+			log.error("Contact list is null or empty");
+			return ResponseEntity.noContent().build();
+		}
+
+		return ResponseEntity.ok(contacts);
 	}
 	
 	@GetMapping("/all/{order_type}")

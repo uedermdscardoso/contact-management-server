@@ -18,6 +18,8 @@ public interface ContactRepositoryPort {
 
 	List<Contact> findByPhone(String phone);
 
+	List<Contact> findByValue(String value);
+	
 	List<Contact> findContactById();
 
 	List<Contact> findContactByName();

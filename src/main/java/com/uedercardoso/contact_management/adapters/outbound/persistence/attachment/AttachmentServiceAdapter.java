@@ -57,9 +57,7 @@ public class AttachmentServiceAdapter implements AttachmentServicePort {
             
             System.out.println("File saved successfully: " + name);
 
-			String url = endpoint + "/" + bucketName + "/" + name;
-
-			return Optional.of(url);
+			return Optional.of(name);
         } catch (S3Exception | IOException e) {
 			throw new RuntimeException("Error occurred while uploading file to S3/Garage: " + e.getMessage(), e);
         }
